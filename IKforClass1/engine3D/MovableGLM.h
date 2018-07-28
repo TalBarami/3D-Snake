@@ -35,6 +35,7 @@ public:
 	void globalSystemRot(float ang, glm::vec3 &vec, int indx);
 	void changeCenterOfRotation(glm::vec3 &Pvec);
 	void zeroTrans();
+	glm::vec4 getTraslate();
 	void getTraslate(glm::vec4 &vec);
 	void copyTranslations(MovableGLM *mGLM);
 	void translateInSystem(const MovableGLM  &system,glm::vec3 &vec, int indx, bool toScale);

@@ -3,12 +3,20 @@
 const int linksNum = 8;
 const int maximumIterations = 1;
 
+const int blue_cubes = 5;
+const int red_cubes = 5;
+
 const int first_link = 0;
-const int last_link = linksNum - 1;
+const int last_link = first_link + linksNum - 1;
 const int target_cube = linksNum;
 
 const float step_size = 0.5f;
 const float epsilon = 0.0001f;
+
+const int blue_cubes_0 = linksNum;
+const int red_cubes_0 = linksNum + blue_cubes;
+const int walls_0 = linksNum + blue_cubes + red_cubes;
+
 
 class IK : public Scene
 {
@@ -17,9 +25,13 @@ class IK : public Scene
 	glm::vec3 targetPosition;
 	bool isIKactive;
 	double delta;
-    float maxDistance; 
+    float maxDistance;
 
 public:
+	glm::vec3 destination;
+	bool movementActive = true;
+	int score = 0;
+	bool gameOver = false;
 
 	IK(void);
 	virtual ~IK(void);
@@ -43,9 +55,13 @@ public:
 	void pick_box();
 	void pick_head();
 	void pick_tail();
+	void check_collisions();
+	static bool is_blue_shape(int indx);
+	static bool is_red_shape(int indx);
+	static bool is_wall(int indx);
 	bool is_active() const { return isIKactive;}
 	void change_mode() { pickedShape = pickedShape == -1 ? 0 : -1; }
 	void set_activation(const bool is_active) { isIKactive = is_active; }
-	
+	void move_enemies();
 };
 

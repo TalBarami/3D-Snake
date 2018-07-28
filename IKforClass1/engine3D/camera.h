@@ -11,7 +11,7 @@ public:
 	{
 		this->pos = pos;
 		this->forward = glm::vec3(0.0f, 0.0f, 1.0f);
-		this->up = glm::vec3(0.0f, 1.0f, 0.0f);
+		this->up = glm::vec3(0.0f, 10.0f, 0.0f);
 		this->projection = glm::perspective(fov, aspect, zNear, zFar);
 		this->fov = fov;
 	}
@@ -54,10 +54,10 @@ public:
 		up = glm::vec3(glm::normalize(rotation * glm::vec4(up, 0.0)));
 	}
 
+	glm::vec3 pos;
 protected:
 private:
 	glm::mat4 projection;
-	glm::vec3 pos;
 	glm::vec3 forward;
 	glm::vec3 up;
 	float fov;

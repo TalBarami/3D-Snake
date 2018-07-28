@@ -50,6 +50,5 @@ public:
 	glm::vec3 getAxisDirection(int indx,int axis);
 	inline void setParent(int indx,int newValue) {chainParents[indx]=newValue;}
 	virtual ~Scene(void);
-
 };
 

@@ -2,6 +2,9 @@
 #include "display.h"
 #include "inputManager.h"
 #include <Windows.h>
+#include <iostream>
+#pragma comment(lib, "winmm.lib")
+
 void init()
 {
 	glfwSetKeyCallback(display.m_window,key_callback);
@@ -68,7 +71,10 @@ int main(int argc, char** argv)
 
 	scn.init(vertices,indices,sizeof(vertices)/sizeof(vertices[0]), sizeof(indices)/sizeof(indices[0]));
 	scn.addShader("./res/shaders/basicShader");
-	scn.addShader("./res/shaders/pickingShader");	
+	scn.addShader("./res/shaders/pickingShader");
+
+	PlaySound(TEXT("C:\\Users\\tbarami\\Documents\\GitHub\\3D-Snake\\IKforClass1\\IK\\res\\sounds\\theme.wav"), NULL, SND_FILENAME | SND_ASYNC);
+
 	//scn.addShape("./res/monkey3.obj","./res/grass.bmp");
 	//Shader shader("./res/basicShader");
 	//inputManager input = inputManager();
@@ -77,14 +83,19 @@ int main(int argc, char** argv)
 	
 	while(!glfwWindowShouldClose(display.m_window))
 	{
-		/*if(scn.is_active())
+		if(scn.gameOver)
 		{
-			Sleep(30);
-			scn.make_change();
-		}*/
-		Sleep(30);
-		scn.pick_tail();
-		scn.shapeTransformation(Scene::zLocalTranslate, 0.01f);
+			std::cout << "Game over. Your score is: " << scn.score << std::endl;
+		} else
+		{
+			scn.move_enemies();
+			if (scn.movementActive)
+			{
+				Sleep(30);
+				scn.make_change();
+			}
+		}
+		
 
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		if(display.IsFullscreen())

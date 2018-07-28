@@ -1,6 +1,7 @@
 #include "IK.h"
 #include <iostream>
 #include <list>
+#include <ctime>
 
 using namespace std;
 using namespace glm;
@@ -51,14 +52,14 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 {
 	myRotate(-90.0f, vec3(1, 0, 0), -1);
 	//addShape(vertices, verticesSize, indices, indicesSize,"./res/textures/plane.png",-1);
-	addShape(0, 2, "./res/textures/plane.png", -1);
+	addShape(0, 2, "./res/textures/snake.jpeg", -1);
 	pickedShape = first_link;
 	shapeTransformation(zScale, scaleFactor);
 
 	for (int i = 1; i < linksNum - 1; i++)
 	{
 		pickedShape = i;
-		addShape(1, 1, "./res/textures/plane.png", -1);
+		addShape(1, 1, "./res/textures/snake.jpeg", -1);
 		shapeTransformation(zScale, scaleFactor);
 
 		shapeTransformation(zGlobalTranslate, 1.0);
@@ -66,23 +67,59 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 	}
 
 	pickedShape = last_link;
-	addShape(0, 3, "./res/textures/plane.png", -1);
+	addShape(0, 3, "./res/textures/copper-head.jpg", -1);
 	shapeTransformation(zScale, scaleFactor);
 
 	shapeTransformation(zGlobalTranslate, 1.0);
 	setParent(linksNum - 1, linksNum - 2);
 
-	// distination point
-	pickedShape = target_cube;
-
+	srand(time(nullptr));
+	auto width = 80, height = 40;
 	//addShape(0,"./res/textures/box0.bmp",-1);
-	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/box0.bmp", -1);
-	shapeTransformation(xScale, 0.5);
-	shapeTransformation(yScale, 0.5);
-	shapeTransformation(zScale, 0.5);
-	shapeTransformation(xGlobalTranslate, -8.0);
-	shapeTransformation(yGlobalTranslate, 4.0);
-	shapeTransformation(zGlobalTranslate, 4.0);
+	for(int i=0; i<blue_cubes; i++)
+	{
+		addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/food.png", -1);
+		pickedShape = blue_cubes_0 + i;
+		shapeTransformation(xGlobalTranslate, (rand() % width) - (width/2));
+		shapeTransformation(zGlobalTranslate, (rand() % height) - (height/2));
+		//shapeTransformation(yGlobalTranslate, (i + 1) * 2.0); forward - backward
+	}
+	for (int i = 0; i<red_cubes; i++)
+	{
+		addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bomb.jpg", -1);
+		pickedShape = red_cubes_0 + i;
+		shapeTransformation(xGlobalTranslate, (rand() % width) - (width / 2));
+		shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
+
+		shapes[pickedShape]->originalPos = glm::vec4(get_center(pickedShape), i % 2 == 0 ? xGlobalTranslate : zGlobalTranslate);
+	}
+
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
+	pickedShape = walls_0;
+	shapeTransformation(zGlobalTranslate, (height / 2) + 5);
+	shapeTransformation(xScale, width);
+
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
+	pickedShape++;
+	shapeTransformation(zGlobalTranslate, -(height / 2) - 5);
+	shapeTransformation(xScale, width);
+
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
+	pickedShape++;
+	shapeTransformation(xGlobalTranslate, (width / 2) + 5);
+	shapeTransformation(zScale, height);
+
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
+	pickedShape++;
+	shapeTransformation(xGlobalTranslate, -(width / 2) - 5);
+	shapeTransformation(zScale, height);
+
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/grass_ground.jpg", -1);
+	pickedShape++;
+	shapeTransformation(yGlobalTranslate, -10);
+	shapeTransformation(zScale, height);
+	shapeTransformation(xScale, width);
+	
 	pickedShape = first_link;
 
 	targetPosition = get_base(target_cube);
@@ -139,7 +176,13 @@ void IK::apply_transformation(std::vector<glm::vec3>& p)
 		clear_rotation(i);
 
 		const auto next_z = normalize(p[i + 1] - p[i]);
-		const auto r_axis = normalize(cross(z_axis, next_z));
+		const auto product = cross(z_axis, next_z);
+		if(product == vec3(0))
+		{
+			movementActive = false;
+			return;
+		}
+		const auto r_axis = normalize(product);
 
 		if (length(r_axis) > epsilon) {
 			const auto x_axis = cross(y_axis, z_axis);
@@ -166,7 +209,9 @@ void IK::calculate_step()
 	p.push_back(get_tip(last_link));
 
 	auto& tip = p[linksNum];
-	auto target = get_center(target_cube);
+
+	auto translation = glm::translate(shapes[first_link]->makeTrans(), destination);
+	auto target = glm::vec3(translation[3]);
 	const auto distance = target - tip;
 
 	if (dot(distance, distance) > step_size) {
@@ -194,15 +239,14 @@ void IK::calculate_step()
 
 void IK::make_change()
 {
-	targetPosition = get_center(target_cube);
+	//check_collisions();
+
 	tipPosition = get_tip(last_link);
-	if (glm::distance(get_base(first_link), targetPosition) >= maxDistance ||
-		glm::distance(tipPosition, targetPosition) < delta) {
-		isIKactive = false;
-		return;
-	}
 
 	calculate_step();
+
+	pick_tail();
+	shapeTransformation(zLocalTranslate, 0.05f);
 }
 
 float IK::distance(const int indx1, const int indx2)
@@ -233,4 +277,68 @@ void IK::pick_tail()
 {
 	pickedShape = first_link;
 }
+
+void IK::check_collisions()
+{
+	for (auto i = blue_cubes_0; i<shapes.size(); i++)
+	{
+		if (shapes[last_link]->collides_with(shapes[i]))
+		{
+			if (is_blue_shape(i))
+			{
+				score++;
+				std::cout << "Your new score is: " << score << std::endl;
+			}
+			else if (is_red_shape(i) || is_wall(i))
+			{
+				gameOver = true;
+			}
+		}
+	}
+
+	/*pickedShape = first_link;
+	glm::vec3 head_pos = glm::vec3(GetShapeTransformation()[3]);
+	std::cout << "head position: " << "{" << head_pos.x << " " << head_pos.y << " " << head_pos.z << "}" << std::endl;
+
+	pickedShape = blue_cubes_0;
+	glm::vec3 dst_pos = glm::vec3(GetShapeTransformation()[3]);
+	std::cout << "head position: " << "{" << dst_pos.x << " " << dst_pos.y << " " << dst_pos.z << "}" << std::endl;
+	if(shapes[first_link]->collides_with(shapes[blue_cubes_0]))
+	{
+		std::cout << "SUCCESS" << std::endl;
+	}*/
+}
+
+bool IK::is_blue_shape(int indx)
+{
+	return indx >= blue_cubes_0 && indx < red_cubes_0;
+}
+
+bool IK::is_red_shape(int indx)
+{
+	return indx >= red_cubes_0 && indx < walls_0;
+}
+
+bool IK::is_wall(int indx)
+{
+	return indx >= walls_0;
+}
+
+void IK::move_enemies()
+{
+	for (int i = red_cubes_0; i < walls_0; i++)
+	{
+		pickedShape = i;
+
+		auto current_pos = get_center(pickedShape);
+		auto distance = glm::distance(current_pos, glm::vec3(shapes[pickedShape]->originalPos));
+		if(distance >= 5)
+		{
+			shapes[pickedShape]->direction *= -1;
+		}
+
+		shapeTransformation(shapes[pickedShape]->originalPos.w, 0.1 * shapes[pickedShape]->direction);
+	}
+}
+
 	

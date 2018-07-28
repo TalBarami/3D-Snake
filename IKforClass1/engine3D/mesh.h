@@ -1,10 +1,9 @@
 #ifndef MESH_INCLUDED_H
 #define MESH_INCLUDED_H
 
-#include <glm/glm.hpp>
 #include <string>
-#include <vector>
 #include "obj_loader.h"
+#include "kdtree.h"
 
 struct Vertex
 {
@@ -34,6 +33,9 @@ private:
 class Mesh
 {
 public:
+	IndexedModel model;
+	Kdtree tree;
+
 	Mesh(int CylParts,int linkPosition);
     Mesh(const std::string& fileName);
 	Mesh(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices);

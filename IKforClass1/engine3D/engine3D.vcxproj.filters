@@ -48,6 +48,9 @@
     <ClCompile Include="curves.cpp">
       <Filter>Header Files\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="kdtree.cpp">
+      <Filter>Header Files\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shape.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="curves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kdtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
