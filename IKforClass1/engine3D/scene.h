@@ -10,6 +10,7 @@ protected:
 	std::vector<Shader*> shaders;
 	std::vector<Shape*> shapes;
 	std::vector<Camera*> cameras; //light will have the properties of camera
+	
 
 	Shape *axisMesh;
 
@@ -17,6 +18,7 @@ protected:
 	
 	static const int scaleFactor = 3;
 public:
+	int camIndx = 0;
 	int pickedShape;
 	enum axis{xAxis,yAxis,zAxis};
 	enum transformations{xLocalTranslate,yLocalTranslate,zLocalTranslate,xGlobalTranslate,yGlobalTranslate,zGlobalTranslate,
@@ -44,7 +46,6 @@ public:
 	void resize(int width,int hight,int near,int far);
 	//void updateTipPosition(int indx);
 	glm::vec3 get_tip(int indx);
-	glm::vec3 get_center(int indx);
 	glm::vec3 get_base(int indx);
 	void clear_rotation(int indx);
 	glm::vec3 getAxisDirection(int indx,int axis);

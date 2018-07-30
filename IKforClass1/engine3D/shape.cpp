@@ -76,6 +76,10 @@ void Shape::addLineMesh(LineVertex* vertices, unsigned int numVertices,unsigned 
 
 void Shape::draw(int mode)
 {
+	if(!active)
+	{
+		return;
+	}
 	//transformations
 	if(tex)
 		tex->Bind();

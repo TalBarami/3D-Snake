@@ -42,6 +42,8 @@ IK::IK(vec3 position, float angle, float hwRelation, float near, float far) : Sc
 	targetPosition = vec3(1, 0, 0);
 	tipPosition = vec3(0, 0, 2 * linksNum*scaleFactor);
 	maxDistance = linksNum * 2.0f * scaleFactor;
+
+	cameras.push_back(new Camera(glm::vec3(0), glm::vec3(0.0f, 0.5f, 0.5f), angle, hwRelation, near, far));
 }
 
 IK::~IK(void)
@@ -90,8 +92,9 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 		pickedShape = red_cubes_0 + i;
 		shapeTransformation(xGlobalTranslate, (rand() % width) - (width / 2));
 		shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
+		shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
 
-		shapes[pickedShape]->originalPos = glm::vec4(get_center(pickedShape), i % 2 == 0 ? xGlobalTranslate : zGlobalTranslate);
+		shapes[pickedShape]->originalPos = glm::vec4(get_base(pickedShape), i % 2 == 0 ? xGlobalTranslate : zGlobalTranslate);
 	}
 
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
@@ -124,6 +127,8 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 
 	targetPosition = get_base(target_cube);
 	tipPosition = get_tip(last_link);
+
+	update_cameras();
 }
 
 void IK::addShape(int CylParts, int linkPosition, int parent)
@@ -167,36 +172,38 @@ void IK::addShape(Vertex* vertices, unsigned int numVertices, unsigned int* indi
 	__super::addShape(vertices, numVertices, indices, numIndices, textureFlieName, parent);
 }
 
-void IK::apply_transformation(std::vector<glm::vec3>& p)
+void IK::make_change()
 {
-	auto z_axis = vec3(0, 0, 1);
-	auto y_axis = vec3(0, 1, 0);
-	for (auto i = 0; i < linksNum; i++)
-	{
-		clear_rotation(i);
+	check_collisions();
 
-		const auto next_z = normalize(p[i + 1] - p[i]);
-		const auto product = cross(z_axis, next_z);
-		if(product == vec3(0))
-		{
-			movementActive = false;
-			return;
-		}
-		const auto r_axis = normalize(product);
+	tipPosition = get_tip(last_link);
 
-		if (length(r_axis) > epsilon) {
-			const auto x_axis = cross(y_axis, z_axis);
-			const auto proj = normalize(next_z - dot(next_z, z_axis) * z_axis);
-			const auto z_deg = degrees(glm::acos(clamp(dot(y_axis, proj), -1.0f, 1.0f))) * (dot(proj, x_axis) > 0 ? -1 : 1);
-			const auto x_deg = degrees(glm::acos(clamp(dot(z_axis, next_z), -1.0f, 1.0f)));
+	calculate_step();
 
-			y_axis = vec3(rotate(x_deg, r_axis) * vec4(y_axis, 0));
-			z_axis = next_z;
-			shapeRotation(z_deg, -x_deg, i);
-		}
-	}
+	update_movement();
+	update_cameras();
 }
 
+void IK::update_movement()
+{
+	auto direction = (get_tip((last_link - first_link) / 2) - get_base((last_link - first_link) / 2))  * 0.05f;
+	pick_tail();
+	int i = pickedShape;
+	for (; chainParents[i] > -1; i = chainParents[i]);
+	shapes[i]->myTranslate(direction, 0);
+}
+
+void IK::update_cameras()
+{
+	auto pos = get_base((last_link - first_link) / 2);
+	auto direction = get_tip(last_link) - get_base(last_link);
+
+	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 15);
+	cameras[snake_camera]->forward = glm::normalize(glm::vec3(direction.x, direction.z, direction.y + 5));
+
+	cameras[above_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 50);
+	cameras[above_camera]->forward = glm::vec3(0, 0, 1);
+}	
 
 void IK::calculate_step()
 {
@@ -237,16 +244,34 @@ void IK::calculate_step()
 	apply_transformation(p);
 }
 
-void IK::make_change()
+void IK::apply_transformation(std::vector<glm::vec3>& p)
 {
-	//check_collisions();
+	auto z_axis = vec3(0, 0, 1);
+	auto y_axis = vec3(0, 1, 0);
+	for (auto i = 0; i < linksNum; i++)
+	{
+		clear_rotation(i);
 
-	tipPosition = get_tip(last_link);
+		const auto next_z = normalize(p[i + 1] - p[i]);
+		const auto product = cross(z_axis, next_z);
+		if (product == vec3(0))
+		{
+			movementActive = false;
+			return;
+		}
+		const auto r_axis = normalize(product);
 
-	calculate_step();
+		if (length(r_axis) > epsilon) {
+			const auto x_axis = cross(y_axis, z_axis);
+			const auto proj = normalize(next_z - dot(next_z, z_axis) * z_axis);
+			const auto z_deg = degrees(glm::acos(clamp(dot(y_axis, proj), -1.0f, 1.0f))) * (dot(proj, x_axis) > 0 ? -1 : 1);
+			const auto x_deg = degrees(glm::acos(clamp(dot(z_axis, next_z), -1.0f, 1.0f)));
 
-	pick_tail();
-	shapeTransformation(zLocalTranslate, 0.05f);
+			y_axis = vec3(rotate(x_deg, r_axis) * vec4(y_axis, 0));
+			z_axis = next_z;
+			shapeRotation(z_deg, -x_deg, i);
+		}
+	}
 }
 
 float IK::distance(const int indx1, const int indx2)
@@ -278,18 +303,32 @@ void IK::pick_tail()
 	pickedShape = first_link;
 }
 
+bool IK::collides(int s1, int s2)
+{
+	glm::vec3 p1 = get_base(s1);
+	glm::vec3 p2 = get_base(s2);
+
+	return glm::distance(p1, p2) < 3;
+
+}
+
 void IK::check_collisions()
 {
 	for (auto i = blue_cubes_0; i<shapes.size(); i++)
 	{
-		if (shapes[last_link]->collides_with(shapes[i]))
+		//if (shapes[last_link]->collides_with(shapes[i]))
+		if(shapes[i]->active && collides(last_link, i))
 		{
+			if(is_blue_shape(i))
+			{
+				shapes[i]->active = false;
+			}
 			if (is_blue_shape(i))
 			{
 				score++;
 				std::cout << "Your new score is: " << score << std::endl;
 			}
-			else if (is_red_shape(i) || is_wall(i))
+			else if (is_red_shape(i))
 			{
 				gameOver = true;
 			}
@@ -330,7 +369,7 @@ void IK::move_enemies()
 	{
 		pickedShape = i;
 
-		auto current_pos = get_center(pickedShape);
+		auto current_pos = get_base(pickedShape);
 		auto distance = glm::distance(current_pos, glm::vec3(shapes[pickedShape]->originalPos));
 		if(distance >= 5)
 		{

@@ -38,7 +38,7 @@ using namespace glm;
 	{
 		glLineWidth(3);
 		
-		cameras.push_back(new Camera(vec3(0,0,-20.0f),60.0f,1.0f,0.1f,100.0f));
+		cameras.push_back(new Camera(vec3(0,0,-20.0f), glm::vec3(0.0f, 0.0f, 1.0f),60.0f,1.0f,0.1f,100.0f));
 		pickedShape = -1;
 		
 	}
@@ -46,7 +46,7 @@ using namespace glm;
 	Scene::Scene(vec3 position,float angle,float hwRelation,float near, float far)
 	{
 		glLineWidth(3);
-		cameras.push_back(new Camera(position,angle,hwRelation,near,far));
+		cameras.push_back(new Camera(position, glm::vec3(0.0f, 0.0f, 1.0f), angle,hwRelation,near,far));
 	//	axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]));
 		pickedShape = -1;
 	}
@@ -115,7 +115,7 @@ using namespace glm;
 	void Scene::draw(int shaderIndx, int cameraIndx, bool drawAxis)
 	{
 		glm::mat4 Normal = makeTrans();
-		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
+		glm::mat4 MVP = cameras[camIndx]->GetViewProjection() * Normal;
 
 		std::vector<glm::mat4> T;
 
@@ -154,7 +154,7 @@ using namespace glm;
 		if(shaderIndx==0)
 		{
 			shaders[shaderIndx]->Bind();
-			shaders[shaderIndx]->Update(cameras[0]->GetViewProjection()*scale(vec3(10,10,10)),Normal*scale(vec3(10,10,10)),0, linksNum, T);
+			shaders[shaderIndx]->Update(cameras[camIndx]->GetViewProjection()*scale(vec3(10,10,10)),Normal*scale(vec3(10,10,10)),0, linksNum, T);
 			axisMesh->draw(GL_LINES);
 		}
 	}
@@ -338,7 +338,7 @@ using namespace glm;
 	void Scene::resize(int width,int height,int near,int far)
 	{
 		glViewport(0,0,width,height);
-		cameras[0]->setProjection((float)width/(float)height,near,far);
+		cameras[camIndx]->setProjection((float)width/(float)height,near,far);
 	}
 
 	float Scene::picking(double x,double y)
@@ -383,15 +383,6 @@ using namespace glm;
 		{
 			return shapes[0]->getPointInSystem(mat4(1),vec3(0,0,-1)); 
 		}
-	}
-
-	vec3 Scene::get_center(int indx)
-	{
-		if(indx > -1)
-		{
-			return vec3(shapes[indx]->makeTrans() * vec4(0, 0, 0, 1));
-		}
-		return vec3(0);
 	}
 
 	vec3 Scene::get_base(int indx)

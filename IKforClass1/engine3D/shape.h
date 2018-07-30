@@ -17,6 +17,7 @@ public:
 
 	glm::vec4 originalPos;
 	int direction = 1;
+	bool active = true;
 
 	enum{triangles,lines};
 	Shape(const Shape& shape);

@@ -22,6 +22,10 @@ float depth;
 
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
+		/*glm::vec3 a = scn.get_tip(first_link);
+		glm::vec3 b = scn.get_base(first_link);
+		std::cout << "a=(" << a.x << "," << a.y << "," << a.z << ")" <<
+			" , " << "b=(" << b.x << "," << b.y << "," << b.z << ")" << std::endl;*/
 		if(action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
 			switch (key)
@@ -70,6 +74,9 @@ float depth;
 				case GLFW_KEY_G:
 					scn.check_collisions();
 					break;
+				case GLFW_KEY_C:
+					if (scn.camIndx == 0) scn.camIndx = 1;
+					else scn.camIndx = 0;
 			default:
 				break;
 			}

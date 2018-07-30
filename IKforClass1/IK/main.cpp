@@ -3,6 +3,7 @@
 #include "inputManager.h"
 #include <Windows.h>
 #include <iostream>
+#include <iomanip>
 #pragma comment(lib, "winmm.lib")
 
 void init()
@@ -73,8 +74,8 @@ int main(int argc, char** argv)
 	scn.addShader("./res/shaders/basicShader");
 	scn.addShader("./res/shaders/pickingShader");
 
-	PlaySound(TEXT("C:\\Users\\tbarami\\Documents\\GitHub\\3D-Snake\\IKforClass1\\IK\\res\\sounds\\theme.wav"), NULL, SND_FILENAME | SND_ASYNC);
-
+	//PlaySound(TEXT("C:\\Users\\tbarami\\Documents\\GitHub\\3D-Snake\\IKforClass1\\IK\\res\\sounds\\theme.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	std::cout << std::setprecision(2) << std::fixed;
 	//scn.addShape("./res/monkey3.obj","./res/grass.bmp");
 	//Shader shader("./res/basicShader");
 	//inputManager input = inputManager();

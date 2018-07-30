@@ -3,8 +3,8 @@
 const int linksNum = 8;
 const int maximumIterations = 1;
 
-const int blue_cubes = 5;
-const int red_cubes = 5;
+const int blue_cubes = 1;
+const int red_cubes = 1;
 
 const int first_link = 0;
 const int last_link = first_link + linksNum - 1;
@@ -17,6 +17,8 @@ const int blue_cubes_0 = linksNum;
 const int red_cubes_0 = linksNum + blue_cubes;
 const int walls_0 = linksNum + blue_cubes + red_cubes;
 
+const int above_camera = 0;
+const int snake_camera = 1;
 
 class IK : public Scene
 {
@@ -48,13 +50,16 @@ public:
 	void addShape(int CylParts,int linkPosition,const std::string& textureFileName,int parent);
 
 	void apply_transformation(std::vector<glm::vec3>& p);
+	void update_cameras();
 	void calculate_step();
 	void make_change();
+	void update_movement();
 	float distance(int indx1, int indx2);
 	void pick_next(int offset);
 	void pick_box();
 	void pick_head();
 	void pick_tail();
+	bool collides(int s1, int s2);
 	void check_collisions();
 	static bool is_blue_shape(int indx);
 	static bool is_red_shape(int indx);
