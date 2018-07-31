@@ -89,11 +89,12 @@ int main(int argc, char** argv)
 			std::cout << "Game over. Your score is: " << scn.score << std::endl;
 		} else
 		{
+			Sleep(30);
 			scn.move_enemies();
+			scn.make_change();
 			if (scn.movementActive)
 			{
-				Sleep(30);
-				scn.make_change();
+				scn.update_movement();
 			}
 		}
 		

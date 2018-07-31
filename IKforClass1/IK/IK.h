@@ -17,6 +17,13 @@ const int blue_cubes_0 = linksNum;
 const int red_cubes_0 = linksNum + blue_cubes;
 const int walls_0 = linksNum + blue_cubes + red_cubes;
 
+const int up_wall = walls_0;
+const int down_wall = walls_0 + 1;
+const int left_wall = walls_0 + 2;
+const int right_wall = walls_0 + 3;
+const int floor_wall = walls_0 + 4;
+
+
 const int above_camera = 0;
 const int snake_camera = 1;
 

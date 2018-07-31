@@ -76,7 +76,7 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 	setParent(linksNum - 1, linksNum - 2);
 
 	srand(time(nullptr));
-	auto width = 80, height = 40;
+	auto width = 120, height = 60;
 	//addShape(0,"./res/textures/box0.bmp",-1);
 	for(int i=0; i<blue_cubes; i++)
 	{
@@ -97,29 +97,33 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 		shapes[pickedShape]->originalPos = glm::vec4(get_base(pickedShape), i % 2 == 0 ? xGlobalTranslate : zGlobalTranslate);
 	}
 
+	// Up
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
 	pickedShape = walls_0;
-	shapeTransformation(zGlobalTranslate, (height / 2) + 5);
+	shapeTransformation(zGlobalTranslate, (height / 2) + 20);
 	shapeTransformation(xScale, width);
 
+	// Down
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
 	pickedShape++;
-	shapeTransformation(zGlobalTranslate, -(height / 2) - 5);
+	shapeTransformation(zGlobalTranslate, -(height / 2) - 20);
 	shapeTransformation(xScale, width);
 
+	// Left
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
 	pickedShape++;
-	shapeTransformation(xGlobalTranslate, (width / 2) + 5);
+	shapeTransformation(xGlobalTranslate, (width / 2) + 20);
 	shapeTransformation(zScale, height);
 
+	// Right
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
 	pickedShape++;
-	shapeTransformation(xGlobalTranslate, -(width / 2) - 5);
+	shapeTransformation(xGlobalTranslate, -(width / 2) - 20);
 	shapeTransformation(zScale, height);
 
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/grass_ground.jpg", -1);
 	pickedShape++;
-	shapeTransformation(yGlobalTranslate, -10);
+	shapeTransformation(yGlobalTranslate, -5);
 	shapeTransformation(zScale, height);
 	shapeTransformation(xScale, width);
 	
@@ -179,14 +183,13 @@ void IK::make_change()
 	tipPosition = get_tip(last_link);
 
 	calculate_step();
-
-	update_movement();
 	update_cameras();
 }
 
 void IK::update_movement()
 {
-	auto direction = (get_tip((last_link - first_link) / 2) - get_base((last_link - first_link) / 2))  * 0.05f;
+	auto direction = glm::normalize(get_tip((last_link - first_link) / 2) - get_base((last_link - first_link) / 2))  * 0.05f;
+	//std::cout << "direction=(" << direction.x << "," << direction.y << "," << direction.z << ")" << std::endl;
 	pick_tail();
 	int i = pickedShape;
 	for (; chainParents[i] > -1; i = chainParents[i]);
@@ -195,11 +198,13 @@ void IK::update_movement()
 
 void IK::update_cameras()
 {
-	auto pos = get_base((last_link - first_link) / 2);
-	auto direction = get_tip(last_link) - get_base(last_link);
+	int eye = last_link;
+	auto pos = get_base(eye);
+	auto direction = glm::normalize(get_tip(eye) - get_base(eye));
+	//std::cout << "direction=(" << direction.x << "," << direction.y << "," << direction.z << ")" << std::endl;
 
-	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 15);
-	cameras[snake_camera]->forward = glm::normalize(glm::vec3(direction.x, direction.z, direction.y + 5));
+	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 5);
+	cameras[snake_camera]->forward = glm::normalize(glm::vec3(direction.x, direction.z, direction.x + direction.z));
 
 	cameras[above_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 50);
 	cameras[above_camera]->forward = glm::vec3(0, 0, 1);
@@ -256,7 +261,6 @@ void IK::apply_transformation(std::vector<glm::vec3>& p)
 		const auto product = cross(z_axis, next_z);
 		if (product == vec3(0))
 		{
-			movementActive = false;
 			return;
 		}
 		const auto r_axis = normalize(product);
@@ -308,7 +312,29 @@ bool IK::collides(int s1, int s2)
 	glm::vec3 p1 = get_base(s1);
 	glm::vec3 p2 = get_base(s2);
 
-	return glm::distance(p1, p2) < 3;
+	if(is_wall(s2))
+	{
+		switch(s2)
+		{
+		case up_wall:
+			return p1.z >= p2.z;
+		case down_wall:
+			return p1.z <= p2.z;
+		case left_wall:
+			return p1.x >= p2.x;
+		case right_wall:
+			return p1.x <= p2.x;
+		case floor_wall:
+			return p1.y <= p2.y;
+		default:
+			break;
+		}
+	} else
+	{
+		return glm::distance(p1, p2) < 3;
+	}
+
+	
 
 }
 
@@ -328,7 +354,7 @@ void IK::check_collisions()
 				score++;
 				std::cout << "Your new score is: " << score << std::endl;
 			}
-			else if (is_red_shape(i))
+			else if (is_red_shape(i) || is_wall(i))
 			{
 				gameOver = true;
 			}

@@ -23,7 +23,7 @@ public:
 
 	inline glm::mat4 GetViewProjection() const
 	{
-		return projection * glm::lookAt(pos, pos + forward, up);
+		return projection * glm::lookAt(pos, pos + forward, glm::vec3(0, 1, 0));
 	}
 
 	void MoveForward(float amt)

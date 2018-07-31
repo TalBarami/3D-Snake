@@ -34,24 +34,24 @@ float depth;
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
 				case GLFW_KEY_D:
-					scn.movementActive = true;
+					scn.movementActive = false;
 					scn.destination = glm::vec3(-50, 0, -50);
 					//scn.pick_head();
 					//scn.shapeTransformation(scn.yGlobalRotate,-30.f);
 					break;
 				case GLFW_KEY_A:
-					scn.movementActive = true;
+					scn.movementActive = false;
 					scn.destination = glm::vec3(50, 0, -50);
 					//scn.pick_head();
 					//scn.shapeTransformation(scn.yGlobalRotate,30.f);
 					break;
 				case GLFW_KEY_W:
-					scn.movementActive = true;
+					scn.movementActive = false;
 					scn.destination = glm::vec3(0, 50, 0);
 					//scn.shapeTransformation(scn.xGlobalRotate,30.f);
 					break;
 				case GLFW_KEY_S:
-					scn.movementActive = true;
+					scn.movementActive = false;
 					scn.destination = glm::vec3(0, -50, 0);
 					//scn.shapeTransformation(scn.xGlobalRotate,-30.f);
 					break;
@@ -83,6 +83,7 @@ float depth;
 		}
 		else {
 			scn.destination = glm::vec3(0, 0, 100);
+			scn.movementActive = true;
 		}
 	}
 	
