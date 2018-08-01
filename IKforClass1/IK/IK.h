@@ -1,5 +1,14 @@
 #pragma once
 #include "scene.h"
+
+const std::string resources_path = R"(C:\Users\tbarami\Documents\GitHub\3D-Snake\IKforClass1\IK\res\)";
+
+const std::string theme_sound = resources_path + "sounds\\theme.wav";
+const std::string win_sound = resources_path + "sounds\\win.wav";
+const std::string lose_sound = resources_path + "sounds\\lose.wav";
+const std::string prize_sound = resources_path + "sounds\\prize.wav";
+
+
 const int linksNum = 8;
 const int maximumIterations = 1;
 

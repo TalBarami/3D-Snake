@@ -1,7 +1,8 @@
 #include "IK.h"
 #include <iostream>
-#include <list>
 #include <ctime>
+#include <Windows.h>
+#pragma comment(lib, "winmm.lib")
 
 using namespace std;
 using namespace glm;
@@ -34,7 +35,7 @@ IK::IK(void)
 	maxDistance = linksNum * 2.0f*scaleFactor;
 }
 
-IK::IK(vec3 position, float angle, float hwRelation, float near, float far) : Scene(position, angle, hwRelation, near, far)
+IK::IK(vec3 position, float angle, float hwRelation, float n, float f) : Scene(position, angle, hwRelation, n, f)
 {
 	cameraMode = false;
 	isIKactive = false;
@@ -43,7 +44,7 @@ IK::IK(vec3 position, float angle, float hwRelation, float near, float far) : Sc
 	tipPosition = vec3(0, 0, 2 * linksNum*scaleFactor);
 	maxDistance = linksNum * 2.0f * scaleFactor;
 
-	cameras.push_back(new Camera(glm::vec3(0), glm::vec3(0.0f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f), angle, hwRelation, near, far));
+	cameras.push_back(new Camera(glm::vec3(0), glm::vec3(0.0f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f), angle, hwRelation, n, f));
 }
 
 IK::~IK(void)
@@ -138,6 +139,7 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 	tipPosition = get_tip(last_link);
 
 	update_cameras();
+	//PlaySound(TEXT(theme_sound.c_str()), NULL, SND_FILENAME | SND_ASYNC);
 }
 
 void IK::addShape(int CylParts, int linkPosition, int parent)
@@ -212,17 +214,17 @@ void IK::update_cameras()
 	auto pos = get_base(snake);
 	auto direction = glm::normalize(get_tip(snake) - get_base(snake));
 
-	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 15);
+	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, -pos.y - 15);
 	cameras[snake_camera]->forward = glm::normalize((glm::vec3(direction.x, direction.z, 0) * (1.0f/2.0f))+ glm::vec3(0, 0, 0.5));
 
-	cameras[above_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 50);
+	cameras[above_camera]->pos = glm::vec3(pos.x, pos.z, -pos.y - 50);
 	cameras[above_camera]->forward = glm::vec3(0, 0, 1);
 
-	std::cout << "pos=";
+	/*std::cout << "pos=";
 	printVector(pos);
 	std::cout << "direction=";
 	printVector(direction);
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 }	
 
 void IK::calculate_step()
@@ -360,21 +362,21 @@ void IK::check_collisions()
 		//if (shapes[last_link]->collides_with(shapes[i]))
 		if(shapes[i]->active && collides(last_link, i))
 		{
-			if(is_blue_shape(i))
-			{
-				shapes[i]->active = false;
-			}
 			if (is_blue_shape(i))
 			{
+				PlaySound(TEXT(prize_sound.c_str()), NULL, SND_FILENAME | SND_ASYNC);
+				shapes[i]->active = false;
 				score++;
 				std::cout << "Your new score is: " << score << std::endl;
 			}
 			if(is_yellow_shape(i))
 			{
+				PlaySound(TEXT(win_sound.c_str()), NULL, SND_FILENAME | SND_ASYNC);
 				gameOver = 1;
 			}
 			if (is_red_shape(i) || is_wall(i))
 			{
+				PlaySound(TEXT(lose_sound.c_str()), NULL, SND_FILENAME | SND_ASYNC);
 				gameOver = 2;
 			}
 		}
