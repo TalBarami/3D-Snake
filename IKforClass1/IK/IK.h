@@ -3,8 +3,8 @@
 const int linksNum = 8;
 const int maximumIterations = 1;
 
-const int blue_cubes = 1;
-const int red_cubes = 1;
+const int blue_cubes = 6;
+const int red_cubes = 6;
 
 const int first_link = 0;
 const int last_link = first_link + linksNum - 1;
@@ -29,6 +29,7 @@ const int snake_camera = 1;
 
 class IK : public Scene
 {
+	
 	bool cameraMode;
 	glm::vec3 tipPosition;
 	glm::vec3 targetPosition;
@@ -41,6 +42,7 @@ public:
 	bool movementActive = true;
 	int score = 0;
 	bool gameOver = false;
+	bool paused = false;
 
 	IK(void);
 	virtual ~IK(void);
@@ -76,4 +78,3 @@ public:
 	void set_activation(const bool is_active) { isIKactive = is_active; }
 	void move_enemies();
 };
-

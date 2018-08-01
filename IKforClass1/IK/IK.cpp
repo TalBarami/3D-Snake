@@ -43,7 +43,7 @@ IK::IK(vec3 position, float angle, float hwRelation, float near, float far) : Sc
 	tipPosition = vec3(0, 0, 2 * linksNum*scaleFactor);
 	maxDistance = linksNum * 2.0f * scaleFactor;
 
-	cameras.push_back(new Camera(glm::vec3(0), glm::vec3(0.0f, 0.5f, 0.5f), angle, hwRelation, near, far));
+	cameras.push_back(new Camera(glm::vec3(0), glm::vec3(0.0f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f), angle, hwRelation, near, far));
 }
 
 IK::~IK(void)
@@ -188,7 +188,7 @@ void IK::make_change()
 
 void IK::update_movement()
 {
-	auto direction = glm::normalize(get_tip((last_link - first_link) / 2) - get_base((last_link - first_link) / 2))  * 0.05f;
+	auto direction = glm::normalize(get_tip((last_link - first_link) / 2) - get_base((last_link - first_link) / 2))  * 0.1f;
 	//std::cout << "direction=(" << direction.x << "," << direction.y << "," << direction.z << ")" << std::endl;
 	pick_tail();
 	int i = pickedShape;
@@ -196,18 +196,28 @@ void IK::update_movement()
 	shapes[i]->myTranslate(direction, 0);
 }
 
+void printVector(glm::vec3 v)
+{
+	std::cout << "(" << v.x << "," << v.y << "," << v.z << ")";
+}
+
 void IK::update_cameras()
 {
-	int eye = last_link;
-	auto pos = get_base(eye);
-	auto direction = glm::normalize(get_tip(eye) - get_base(eye));
-	//std::cout << "direction=(" << direction.x << "," << direction.y << "," << direction.z << ")" << std::endl;
+	int snake = last_link - 2;
+	auto pos = get_base(snake);
+	auto direction = glm::normalize(get_tip(snake) - get_base(snake));
 
-	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 5);
-	cameras[snake_camera]->forward = glm::normalize(glm::vec3(direction.x, direction.z, direction.x + direction.z));
+	cameras[snake_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 15);
+	cameras[snake_camera]->forward = glm::normalize((glm::vec3(direction.x, direction.z, 0) * (1.0f/2.0f))+ glm::vec3(0, 0, 0.5));
 
 	cameras[above_camera]->pos = glm::vec3(pos.x, pos.z, pos.y - 50);
 	cameras[above_camera]->forward = glm::vec3(0, 0, 1);
+
+	std::cout << "pos=";
+	printVector(pos);
+	std::cout << "direction=";
+	printVector(direction);
+	std::cout << std::endl;
 }	
 
 void IK::calculate_step()

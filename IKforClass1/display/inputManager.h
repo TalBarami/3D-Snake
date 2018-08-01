@@ -77,6 +77,10 @@ float depth;
 				case GLFW_KEY_C:
 					if (scn.camIndx == 0) scn.camIndx = 1;
 					else scn.camIndx = 0;
+					break;
+				case GLFW_KEY_P:
+					scn.paused = !scn.paused;
+					break;
 			default:
 				break;
 			}

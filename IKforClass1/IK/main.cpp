@@ -84,19 +84,23 @@ int main(int argc, char** argv)
 	
 	while(!glfwWindowShouldClose(display.m_window))
 	{
-		if(scn.gameOver)
+		if(!scn.paused)
 		{
-			std::cout << "Game over. Your score is: " << scn.score << std::endl;
-		} else
-		{
-			Sleep(30);
-			scn.move_enemies();
-			scn.make_change();
-			if (scn.movementActive)
+			if(scn.gameOver)
 			{
-				scn.update_movement();
+				std::cout << "Game over. Your score is: " << scn.score << std::endl;
+			} else
+			{
+				Sleep(30);
+				scn.move_enemies();
+				scn.make_change();
+				if (scn.movementActive)
+				{
+					scn.update_movement();
+				}
 			}
 		}
+		
 		
 
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);

@@ -38,7 +38,7 @@ using namespace glm;
 	{
 		glLineWidth(3);
 		
-		cameras.push_back(new Camera(vec3(0,0,-20.0f), glm::vec3(0.0f, 0.0f, 1.0f),60.0f,1.0f,0.1f,100.0f));
+		cameras.push_back(new Camera(vec3(0,0,-20.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),60.0f,1.0f,0.1f,100.0f));
 		pickedShape = -1;
 		
 	}
@@ -46,7 +46,7 @@ using namespace glm;
 	Scene::Scene(vec3 position,float angle,float hwRelation,float near, float far)
 	{
 		glLineWidth(3);
-		cameras.push_back(new Camera(position, glm::vec3(0.0f, 0.0f, 1.0f), angle,hwRelation,near,far));
+		cameras.push_back(new Camera(position, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), angle,hwRelation,near,far));
 	//	axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]));
 		pickedShape = -1;
 	}
