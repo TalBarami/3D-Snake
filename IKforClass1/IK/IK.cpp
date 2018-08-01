@@ -77,7 +77,7 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 
 	srand(time(nullptr));
 	auto width = 120, height = 60;
-	//addShape(0,"./res/textures/box0.bmp",-1);
+	// Blue
 	for(int i=0; i<blue_cubes; i++)
 	{
 		addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/food.png", -1);
@@ -86,17 +86,22 @@ void IK::init(Vertex *vertices, unsigned int *indices, int verticesSize, int ind
 		shapeTransformation(zGlobalTranslate, (rand() % height) - (height/2));
 		//shapeTransformation(yGlobalTranslate, (i + 1) * 2.0); forward - backward
 	}
+	// Red
 	for (int i = 0; i<red_cubes; i++)
 	{
 		addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bomb.jpg", -1);
 		pickedShape = red_cubes_0 + i;
 		shapeTransformation(xGlobalTranslate, (rand() % width) - (width / 2));
 		shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
-		shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
 
 		shapes[pickedShape]->originalPos = glm::vec4(get_base(pickedShape), i % 2 == 0 ? xGlobalTranslate : zGlobalTranslate);
 	}
 
+	// Yellow
+	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/golden.jpg", -1);
+	pickedShape = yellow_cube_0;
+	shapeTransformation(xGlobalTranslate, (rand() % width) - (width / 2));
+	shapeTransformation(zGlobalTranslate, (rand() % height) - (height / 2));
 	// Up
 	addShape(vertices, verticesSize, indices, indicesSize, "./res/textures/bricks.jpg", -1);
 	pickedShape = walls_0;
@@ -364,9 +369,13 @@ void IK::check_collisions()
 				score++;
 				std::cout << "Your new score is: " << score << std::endl;
 			}
-			else if (is_red_shape(i) || is_wall(i))
+			if(is_yellow_shape(i))
 			{
-				gameOver = true;
+				gameOver = 1;
+			}
+			if (is_red_shape(i) || is_wall(i))
+			{
+				gameOver = 2;
 			}
 		}
 	}
@@ -391,7 +400,12 @@ bool IK::is_blue_shape(int indx)
 
 bool IK::is_red_shape(int indx)
 {
-	return indx >= red_cubes_0 && indx < walls_0;
+	return indx >= red_cubes_0 && indx < yellow_cube_0;
+}
+
+bool IK::is_yellow_shape(int indx)
+{
+	return indx == yellow_cube_0;
 }
 
 bool IK::is_wall(int indx)

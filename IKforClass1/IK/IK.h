@@ -14,8 +14,9 @@ const float step_size = 0.5f;
 const float epsilon = 0.0001f;
 
 const int blue_cubes_0 = linksNum;
-const int red_cubes_0 = linksNum + blue_cubes;
-const int walls_0 = linksNum + blue_cubes + red_cubes;
+const int red_cubes_0 = blue_cubes_0 + blue_cubes;
+const int yellow_cube_0 = red_cubes_0 + red_cubes;
+const int walls_0 = yellow_cube_0 + 1;
 
 const int up_wall = walls_0;
 const int down_wall = walls_0 + 1;
@@ -41,7 +42,7 @@ public:
 	glm::vec3 destination;
 	bool movementActive = true;
 	int score = 0;
-	bool gameOver = false;
+	int gameOver = 0;
 	bool paused = false;
 
 	IK(void);
@@ -72,6 +73,7 @@ public:
 	void check_collisions();
 	static bool is_blue_shape(int indx);
 	static bool is_red_shape(int indx);
+	static bool is_yellow_shape(int indx);
 	static bool is_wall(int indx);
 	bool is_active() const { return isIKactive;}
 	void change_mode() { pickedShape = pickedShape == -1 ? 0 : -1; }

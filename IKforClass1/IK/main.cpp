@@ -86,18 +86,19 @@ int main(int argc, char** argv)
 	{
 		if(!scn.paused)
 		{
-			if(scn.gameOver)
+			Sleep(30);
+			if(scn.gameOver == 1)
 			{
-				std::cout << "Game over. Your score is: " << scn.score << std::endl;
-			} else
+				std::cout << "You won! Your score is: " << scn.score << std::endl;
+			}
+			else if (scn.gameOver == 2) {
+				std::cout << "You lost! Your score is: " << scn.score << std::endl;
+			}
+			else
 			{
-				Sleep(30);
 				scn.move_enemies();
 				scn.make_change();
-				if (scn.movementActive)
-				{
-					scn.update_movement();
-				}
+				scn.update_movement();
 			}
 		}
 		
