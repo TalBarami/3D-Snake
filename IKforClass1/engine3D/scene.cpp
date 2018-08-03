@@ -136,7 +136,7 @@ using namespace glm;
 			
 			if (shaderIndx == 0 && drawAxis && chainParents[i] >= 0)
 			{
-				shaders[shaderIndx]->Update(axisMesh->makeTransScale(MVP1), axisMesh->makeTransScale(Normal1), 0, linksNum, T);
+				shaders[shaderIndx]->Update(axisMesh->makeTransScale(MVP1), axisMesh->makeTransScale(Normal1), 0, linksNum, T, cameras[camIndx]->pos);
 				axisMesh->draw(GL_LINES);
 			}
 
@@ -144,7 +144,7 @@ using namespace glm;
 			Normal1 = Normal1 * shapes[i]->makeTrans();
 			T.push_back(MVP1);
 
-			shaders[shaderIndx]->Update(MVP1, Normal1, i, linksNum, T);
+			shaders[shaderIndx]->Update(MVP1, Normal1, i, linksNum, T, cameras[camIndx]->pos);
 
 			if (shaderIndx == 1)
 				shapes[i]->draw(GL_TRIANGLES);
@@ -154,7 +154,7 @@ using namespace glm;
 		if(shaderIndx==0)
 		{
 			shaders[shaderIndx]->Bind();
-			shaders[shaderIndx]->Update(cameras[camIndx]->GetViewProjection()*scale(vec3(10,10,10)),Normal*scale(vec3(10,10,10)),0, linksNum, T);
+			shaders[shaderIndx]->Update(cameras[camIndx]->GetViewProjection()*scale(vec3(10,10,10)),Normal*scale(vec3(10,10,10)),0, linksNum, T, cameras[camIndx]->pos);
 			axisMesh->draw(GL_LINES);
 		}
 	}

@@ -44,6 +44,7 @@ Shader::Shader(const std::string& fileName)
 	m_uniforms[4] = glGetUniformLocation(m_program, "links_num");
 	m_uniforms[5] = glGetUniformLocation(m_program, "link");
 	m_uniforms[6] = glGetUniformLocation(m_program, "T");
+	m_uniforms[7] = glGetUniformLocation(m_program, "eyePosition");
 }
 
 Shader::~Shader()
@@ -62,7 +63,7 @@ void Shader::Bind()
 	glUseProgram(m_program);
 }
 
-void Shader::Update(glm::mat4 MVP ,glm::mat4 Normal , int const shpIndx, const int links_num, std::vector<glm::mat4> T)
+void Shader::Update(glm::mat4 MVP ,glm::mat4 Normal , int const shpIndx, const int links_num, std::vector<glm::mat4> T, glm::vec3 camPos)
 {
 
 	
@@ -83,6 +84,7 @@ void Shader::Update(glm::mat4 MVP ,glm::mat4 Normal , int const shpIndx, const i
 	glUniform1i(m_uniforms[4], links_num);
 	glUniform1i(m_uniforms[5], shpIndx);
 	glUniformMatrix4fv(m_uniforms[6], T.size(), GL_FALSE, &T[0][0][0]);
+	glUniform4f(m_uniforms[7], camPos.x, camPos.y, camPos.z, 1);
 }
 
 std::string Shader::LoadShader(const std::string& fileName)
