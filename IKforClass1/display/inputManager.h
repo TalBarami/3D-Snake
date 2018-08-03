@@ -56,23 +56,24 @@ float depth;
 					//scn.shapeTransformation(scn.xGlobalRotate,-30.f);
 					break;
 				case GLFW_KEY_UP:
-					scn.pick_tail();
-					scn.shapeTransformation(scn.zLocalTranslate, 1.f);
-					break;
-				case GLFW_KEY_DOWN:
-					scn.pick_tail();
+					scn.pickedShape = -1;
+					scn.camIndx = 0;
 					scn.shapeTransformation(scn.zLocalTranslate, -1.f);
 					break;
+				case GLFW_KEY_DOWN:
+					scn.pickedShape = -1;
+					scn.camIndx = 0;
+					scn.shapeTransformation(scn.zLocalTranslate, 1.f);
+					break;
 				case GLFW_KEY_LEFT:
-					scn.pick_tail();
+					scn.pickedShape = -1;
+					scn.camIndx = 0;
 					scn.shapeTransformation(scn.xLocalTranslate, 1.f);
 					break;
 				case GLFW_KEY_RIGHT:
-					scn.pick_tail();;
+					scn.pickedShape = -1;
+					scn.camIndx = 0;
 					scn.shapeTransformation(scn.xLocalTranslate, -1.f);
-					break;
-				case GLFW_KEY_G:
-					scn.check_collisions();
 					break;
 				case GLFW_KEY_C:
 					if (scn.camIndx == 0) scn.camIndx = 1;
